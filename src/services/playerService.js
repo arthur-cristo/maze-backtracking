@@ -12,6 +12,7 @@ export class Player {
     this.stack = []; // Pilha para rastrear o caminho
     this.tries = 0; // Contador de tentativas
     this.steps = 0; // Contador de passos
+    this.returns = 0; // Contador de retornos
     this.initializePlayer();
   }
 
@@ -26,9 +27,11 @@ export class Player {
     if (this.isSolving) return;
     this.isSolving = true;
 
-    // Reset do contador de passos
+    // Reset dos contadores
     this.steps = 0;
+    this.returns = 0;
     document.getElementById("steps-value").innerText = this.steps;
+    document.getElementById("returns-value").innerText = this.returns;
 
     // Limpa o estado anterior
     for (let y = 0; y < this.rows; y++) {
@@ -123,7 +126,9 @@ export class Player {
         // Se não deu certo, volta
         this.stack.pop();
         this.steps++; // Incrementa o contador de passos ao voltar
+        this.returns++; // Incrementa o contador de retornos
         document.getElementById("steps-value").innerText = this.steps;
+        document.getElementById("returns-value").innerText = this.returns;
 
         // Laranja claro para caminho errado
         if (

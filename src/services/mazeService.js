@@ -168,5 +168,6 @@ buttonsDiv.insertBefore(solveButton, buttonsDiv.firstChild);
 export const generateMaze = () => {
   steps = 0;
   stepsElement.innerText = steps;
+  document.getElementById("returns-value").innerText = "0";
   const { cols, rows } = generateGrid();
 };

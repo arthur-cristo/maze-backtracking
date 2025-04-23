@@ -101,12 +101,12 @@ button:focus-visible {
   margin: 0;
 }
 
-#steps-text {
+#steps-text, #returns-text {
   margin: 1em 0;
   font-size: 1.2em;
 }
 
-#steps-value {
+#steps-value, #returns-value {
   font-weight: bold;
   color: #4CAF50;
 }
