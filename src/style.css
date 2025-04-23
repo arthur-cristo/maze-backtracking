@@ -67,10 +67,11 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: #cccccc;
+    color: #213547;
   }
   .maze-cell {
-    background-color: #ffffff;
+    background-color: #cccccc;
     border: 1px solid #213547;
   }
 }

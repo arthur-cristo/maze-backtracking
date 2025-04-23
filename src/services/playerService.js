@@ -32,7 +32,7 @@ export class Player {
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: light)").matches
         )
-          this.grid[y][x].style.backgroundColor = "white";
+          this.grid[y][x].style.backgroundColor = "#cccccc";
         else this.grid[y][x].style.backgroundColor = "#1a1a1a";
       }
     }
@@ -152,7 +152,7 @@ export class Player {
             window.matchMedia &&
             window.matchMedia("(prefers-color-scheme: light)").matches
           )
-            this.grid[y][x].style.backgroundColor = "white";
+            this.grid[y][x].style.backgroundColor = "#cccccc";
           else this.grid[y][x].style.backgroundColor = "#1a1a1a";
         }
       }
