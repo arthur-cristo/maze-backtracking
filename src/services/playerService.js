@@ -10,6 +10,7 @@ export class Player {
     this.solutionPath = [];
     this.isSolving = false;
     this.stack = []; // Pilha para rastrear o caminho
+    this.tries = 0; // Contador de tentativas
     this.initializePlayer();
   }
 
@@ -23,14 +24,19 @@ export class Player {
   async solveMaze() {
     if (this.isSolving) return;
     this.isSolving = true;
-    
+
     // Limpa o estado anterior
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
-        this.grid[y][x].style.backgroundColor = "white";
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: light)").matches
+        )
+          this.grid[y][x].style.backgroundColor = "white";
+        else this.grid[y][x].style.backgroundColor = "#1a1a1a";
       }
     }
-    
+
     this.visitedCells.clear();
     this.solutionPath = [];
     this.stack = [];
@@ -39,12 +45,12 @@ export class Player {
     this.currentCell = this.grid[this.y][this.x];
     this.visitedCells.add(`${this.x},${this.y}`);
     this.stack.push([this.x, this.y]);
-    
+
     const endX = this.cols - 1;
     const endY = this.rows - 1;
-    
+
     const success = await this.backtrack(this.x, this.y, endX, endY);
-    
+
     if (success) {
       console.log("Labirinto resolvido!");
       await this.showSolution();
@@ -52,7 +58,7 @@ export class Player {
       console.log("Não foi possível encontrar uma solução!");
       this.resetToStart();
     }
-    
+
     this.isSolving = false;
   }
 
@@ -65,40 +71,43 @@ export class Player {
 
     // Direções possíveis
     const directions = [
-      [1, 0],  // direita
-      [0, 1],  // baixo
+      [1, 0], // direita
+      [0, 1], // baixo
       [-1, 0], // esquerda
-      [0, -1]  // cima
+      [0, -1], // cima
     ];
 
     // Tenta cada direção
     for (const [dx, dy] of directions) {
       const newX = x + dx;
       const newY = y + dy;
-      
-      if (this.isValidMove(newX, newY) && !this.visitedCells.has(`${newX},${newY}`)) {
+
+      if (
+        this.isValidMove(newX, newY) &&
+        !this.visitedCells.has(`${newX},${newY}`)
+      ) {
         // Marca a célula atual como visitada
         this.visitedCells.add(`${newX},${newY}`);
         this.stack.push([newX, newY]);
-        
+        this.tries++;
         // Move o robô visualmente
         this.currentCell.style.backgroundColor = "#87CEEB"; // Azul claro para caminho visitado
         this.x = newX;
         this.y = newY;
         this.currentCell = this.grid[newY][newX];
         this.currentCell.style.backgroundColor = "#4CAF50";
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // Tenta resolver a partir da nova posição
         if (await this.backtrack(newX, newY, endX, endY)) {
           return true;
         }
-        
+
         // Se não deu certo, volta
         this.stack.pop();
         this.currentCell.style.backgroundColor = "#FFA07A"; // Laranja claro para caminho errado
-        
+
         // Move o robô de volta
         if (this.stack.length > 0) {
           const [lastX, lastY] = this.stack[this.stack.length - 1];
@@ -107,8 +116,8 @@ export class Player {
           this.currentCell = this.grid[lastY][lastX];
           this.currentCell.style.backgroundColor = "#4CAF50";
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
@@ -127,15 +136,20 @@ export class Player {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         if (this.grid[y][x].style.backgroundColor !== "#4CAF50") {
-          this.grid[y][x].style.backgroundColor = "white";
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches
+          )
+            this.grid[y][x].style.backgroundColor = "white";
+          else this.grid[y][x].style.backgroundColor = "#1a1a1a";
         }
       }
     }
-    
+
     // Mostra o caminho da solução
     for (const [x, y] of this.solutionPath) {
       this.grid[y][x].style.backgroundColor = "#2196F3";
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
   }
 
@@ -149,14 +163,30 @@ export class Player {
     const nextCell = this.grid[y][x];
 
     // Verifica a direção do movimento e as paredes correspondentes
-    if (x > this.x) { // Movendo para direita
-      return currentCell.style.borderRight === "none" && nextCell.style.borderLeft === "none";
-    } else if (x < this.x) { // Movendo para esquerda
-      return currentCell.style.borderLeft === "none" && nextCell.style.borderRight === "none";
-    } else if (y > this.y) { // Movendo para baixo
-      return currentCell.style.borderBottom === "none" && nextCell.style.borderTop === "none";
-    } else if (y < this.y) { // Movendo para cima
-      return currentCell.style.borderTop === "none" && nextCell.style.borderBottom === "none";
+    if (x > this.x) {
+      // Movendo para direita
+      return (
+        currentCell.style.borderRight === "none" &&
+        nextCell.style.borderLeft === "none"
+      );
+    } else if (x < this.x) {
+      // Movendo para esquerda
+      return (
+        currentCell.style.borderLeft === "none" &&
+        nextCell.style.borderRight === "none"
+      );
+    } else if (y > this.y) {
+      // Movendo para baixo
+      return (
+        currentCell.style.borderBottom === "none" &&
+        nextCell.style.borderTop === "none"
+      );
+    } else if (y < this.y) {
+      // Movendo para cima
+      return (
+        currentCell.style.borderTop === "none" &&
+        nextCell.style.borderBottom === "none"
+      );
     }
 
     return false;
@@ -169,4 +199,4 @@ export class Player {
   getVisitedCells() {
     return this.visitedCells;
   }
-} 
+}

@@ -1,10 +1,7 @@
-import { formatTime } from "../utils";
 import { Player } from "./playerService";
 
-let time = 0;
 let steps = 0;
 let player = null;
-const timerElement = document.getElementById("time-value");
 const stepsElement = document.getElementById("steps-value");
 
 // Direções possíveis para mover (cima, direita, baixo, esquerda)
@@ -110,8 +107,7 @@ const generateGrid = () => {
       cell.style.width = `${cellWidth}px`;
       cell.style.height = `${cellHeight}px`;
       cell.style.boxSizing = "border-box";
-      cell.style.border = "1px solid black";
-      cell.style.backgroundColor = "white";
+      cell.style.border = "1px solid";
       rowDiv.appendChild(cell);
       rowCells.push(cell);
     }
@@ -168,9 +164,7 @@ const buttonsDiv = document.getElementById("buttons");
 buttonsDiv.insertBefore(solveButton, buttonsDiv.firstChild);
 
 export const generateMaze = () => {
-  time = 0;
   steps = 0;
-  timerElement.innerText = formatTime(time);
   stepsElement.innerText = steps;
   const { cols, rows } = generateGrid();
 };
