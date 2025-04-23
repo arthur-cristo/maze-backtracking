@@ -1,13 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <link rel="stylesheet" href="src/style.css" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <title>Maze Backtracking</title>
   </head>
+
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <div class="screen active" id="start-screen">
+      <h1>Maze Backtracking</h1>
+      <p id="description">
+        Welcome to the Maze Backtracking game!<br />
+        Click the button below to start.
+      </p>
+      <button id="start-button">Start</button>
+    </div>
+    <div class="screen inactive" id="maze-screen">
+      <aside id="sidebar">
+        <h1>Maze Backtracking</h1>
+        <div id="data">
+          <h2 id="time-text">Time: <span id="time-value">00:00</span></h2>
+          <h2 id="steps-text">Steps: <span id="steps-value">0</span></h2>
+        </div>
+        <div id="buttons">
+          <button id="reset-button">Reset</button>
+          <button id="menu-button">Go Back</button>
+        </div>
+      </aside>
+      <div id="maze-container"></div>
+    </div>
+    <script type="module" src="/src/script.js"></script>
   </body>
 </html>
