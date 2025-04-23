@@ -38,14 +38,19 @@ export class Player {
     // Limpa o estado anterior
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
-        if (
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: light)").matches
-        )
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
           this.grid[y][x].style.backgroundColor = "#cccccc";
-        else this.grid[y][x].style.backgroundColor = "#1a1a1a";
+        else
+          this.grid[y][x].style.backgroundColor = "#1a1a1a";
       }
     }
+
+    // Mantém a cor da célula final
+    const endCell = this.grid[this.rows - 1][this.cols - 1];
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+      endCell.style.backgroundColor = "#FFD700";
+    else
+      endCell.style.backgroundColor = "#FFA500";
 
     this.visitedCells.clear();
     this.solutionPath = [];
@@ -179,19 +184,21 @@ export class Player {
     // Limpa as cores do caminho
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
-        if (this.grid[y][x].style.backgroundColor !== "#4CAF50") {
-          if (
-            window.matchMedia &&
-            window.matchMedia("(prefers-color-scheme: light)").matches
-          )
-            this.grid[y][x].style.backgroundColor = "#cccccc";
-          else this.grid[y][x].style.backgroundColor = "#1a1a1a";
-        }
+        // Não altera a cor da célula final
+        if (y === this.rows - 1 && x === this.cols - 1) continue;
+        
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+          this.grid[y][x].style.backgroundColor = "#cccccc";
+        else
+          this.grid[y][x].style.backgroundColor = "#1a1a1a";
       }
     }
 
     // Mostra o caminho da solução
     for (const [x, y] of this.solutionPath) {
+      // Não altera a cor da célula final
+      if (y === this.rows - 1 && x === this.cols - 1) continue;
+      
       this.grid[y][x].style.backgroundColor = "#2196F3";
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
@@ -261,6 +268,13 @@ export class Player {
           this.grid[y][x].style.backgroundColor = "#1a1a1a";
       }
     }
+    
+    // Mantém a cor da célula final
+    const endCell = this.grid[this.rows - 1][this.cols - 1];
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+      endCell.style.backgroundColor = "#FFD700";
+    else
+      endCell.style.backgroundColor = "#FFA500";
     
     // Retorna o player para a posição inicial
     this.x = 0;

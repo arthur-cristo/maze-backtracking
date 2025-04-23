@@ -117,6 +117,13 @@ const generateGrid = () => {
   
   generateMazeBacktracking(grid, cols, rows);
   
+  // Define a cor da célula final
+  const endCell = grid[rows - 1][cols - 1];
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+    endCell.style.backgroundColor = "#FFD700"; // Dourado para tema claro
+  else
+    endCell.style.backgroundColor = "#FFA500"; // Laranja para tema escuro
+  
   // Inicializa o player após gerar o labirinto
   player = new Player(grid, cols, rows);
   
