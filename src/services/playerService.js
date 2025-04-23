@@ -13,6 +13,7 @@ export class Player {
     this.tries = 0; // Contador de tentativas
     this.steps = 0; // Contador de passos
     this.returns = 0; // Contador de retornos
+    this.shouldStop = false;
     this.initializePlayer();
   }
 
@@ -26,6 +27,7 @@ export class Player {
   async solveMaze() {
     if (this.isSolving) return;
     this.isSolving = true;
+    this.shouldStop = false;
 
     // Reset dos contadores
     this.steps = 0;
@@ -57,24 +59,31 @@ export class Player {
     const endX = this.cols - 1;
     const endY = this.rows - 1;
 
-    const success = await this.backtrack(this.x, this.y, endX, endY);
-
-    if (success) {
-      console.log("Labirinto resolvido!");
-      await this.showSolution();
-    } else {
-      console.log("Não foi possível encontrar uma solução!");
-      this.resetToStart();
+    try {
+      const success = await this.backtrack(this.x, this.y, endX, endY);
+      if (success && !this.shouldStop) {
+        console.log("Labirinto resolvido!");
+        await this.showSolution();
+      }
+    } catch (e) {
+      if (e.message === 'STOPPED') {
+        console.log("Resolução cancelada!");
+        this.resetToStart();
+      }
+    } finally {
+      this.isSolving = false;
     }
-
-    this.isSolving = false;
   }
 
   async backtrack(x, y, endX, endY) {
+    if (this.shouldStop) {
+      throw new Error('STOPPED');
+    }
+
     // Se chegou ao final, retorna sucesso
     if (x === endX && y === endY) {
       this.solutionPath = [...this.stack];
-      this.steps++; // Conta o último passo
+      this.steps++;
       document.getElementById("steps-value").innerText = this.steps;
       return true;
     }
@@ -89,6 +98,10 @@ export class Player {
 
     // Tenta cada direção
     for (const [dx, dy] of directions) {
+      if (this.shouldStop) {
+        throw new Error('STOPPED');
+      }
+
       const newX = x + dx;
       const newY = y + dy;
 
@@ -100,11 +113,10 @@ export class Player {
         this.visitedCells.add(`${newX},${newY}`);
         this.stack.push([newX, newY]);
         this.tries++;
-        this.steps++; // Incrementa o contador de passos
+        this.steps++;
         document.getElementById("steps-value").innerText = this.steps;
 
         // Move o robô visualmente
-        // Azul claro para caminho visitado
         if (
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: light)").matches
@@ -118,19 +130,21 @@ export class Player {
 
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        // Tenta resolver a partir da nova posição
-        if (await this.backtrack(newX, newY, endX, endY)) {
-          return true;
+        try {
+          if (await this.backtrack(newX, newY, endX, endY)) {
+            return true;
+          }
+        } catch (e) {
+          if (e.message === 'STOPPED') throw e;
         }
 
         // Se não deu certo, volta
         this.stack.pop();
-        this.steps++; // Incrementa o contador de passos ao voltar
-        this.returns++; // Incrementa o contador de retornos
+        this.steps++;
+        this.returns++;
         document.getElementById("steps-value").innerText = this.steps;
         document.getElementById("returns-value").innerText = this.returns;
 
-        // Laranja claro para caminho errado
         if (
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: light)").matches
@@ -228,5 +242,30 @@ export class Player {
 
   getVisitedCells() {
     return this.visitedCells;
+  }
+
+  stop() {
+    this.shouldStop = true;
+    this.isSolving = false;
+    this.steps = 0;
+    this.returns = 0;
+    document.getElementById("steps-value").innerText = this.steps;
+    document.getElementById("returns-value").innerText = this.returns;
+    
+    // Limpa as cores do caminho
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+          this.grid[y][x].style.backgroundColor = "#cccccc";
+        else
+          this.grid[y][x].style.backgroundColor = "#1a1a1a";
+      }
+    }
+    
+    // Retorna o player para a posição inicial
+    this.x = 0;
+    this.y = 0;
+    this.currentCell = this.grid[this.y][this.x];
+    this.currentCell.style.backgroundColor = "#4CAF50";
   }
 }

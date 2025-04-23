@@ -161,11 +161,24 @@ solveButton.addEventListener("click", () => {
   }
 });
 
+// Adiciona o botão de parar
+const stopButton = document.getElementById("stop-button");
+stopButton.addEventListener("click", () => {
+  if (player) {
+    player.stop();
+  }
+});
+
 // Adiciona o botão à sidebar
 const buttonsDiv = document.getElementById("buttons");
 buttonsDiv.insertBefore(solveButton, buttonsDiv.firstChild);
 
 export const generateMaze = () => {
+  // Para a resolução atual se estiver em andamento
+  if (player) {
+    player.stop();
+  }
+  
   steps = 0;
   stepsElement.innerText = steps;
   document.getElementById("returns-value").innerText = "0";
