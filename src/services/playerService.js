@@ -91,7 +91,13 @@ export class Player {
         this.stack.push([newX, newY]);
         this.tries++;
         // Move o robô visualmente
-        this.currentCell.style.backgroundColor = "#87CEEB"; // Azul claro para caminho visitado
+        // Azul claro para caminho visitado
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: light)").matches
+        )
+          this.grid[y][x].style.backgroundColor = "#87CEEB";
+        else this.grid[y][x].style.backgroundColor = "#376f8a";
         this.x = newX;
         this.y = newY;
         this.currentCell = this.grid[newY][newX];
@@ -106,7 +112,13 @@ export class Player {
 
         // Se não deu certo, volta
         this.stack.pop();
-        this.currentCell.style.backgroundColor = "#FFA07A"; // Laranja claro para caminho errado
+        // Laranja claro para caminho errado
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: light)").matches
+        )
+          this.currentCell.style.backgroundColor = "#FFA07A";
+        else this.currentCell.style.backgroundColor = "#b36b4a";
 
         // Move o robô de volta
         if (this.stack.length > 0) {
