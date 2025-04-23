@@ -155,6 +155,8 @@ solveButton.id = "solve-button";
 solveButton.textContent = "Resolver Labirinto";
 solveButton.addEventListener("click", () => {
   if (player) {
+    steps = 0;
+    stepsElement.innerText = steps;
     player.solveMaze();
   }
 });

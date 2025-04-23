@@ -11,6 +11,7 @@ export class Player {
     this.isSolving = false;
     this.stack = []; // Pilha para rastrear o caminho
     this.tries = 0; // Contador de tentativas
+    this.steps = 0; // Contador de passos
     this.initializePlayer();
   }
 
@@ -24,6 +25,10 @@ export class Player {
   async solveMaze() {
     if (this.isSolving) return;
     this.isSolving = true;
+
+    // Reset do contador de passos
+    this.steps = 0;
+    document.getElementById("steps-value").innerText = this.steps;
 
     // Limpa o estado anterior
     for (let y = 0; y < this.rows; y++) {
@@ -66,6 +71,8 @@ export class Player {
     // Se chegou ao final, retorna sucesso
     if (x === endX && y === endY) {
       this.solutionPath = [...this.stack];
+      this.steps++; // Conta o último passo
+      document.getElementById("steps-value").innerText = this.steps;
       return true;
     }
 
@@ -90,6 +97,9 @@ export class Player {
         this.visitedCells.add(`${newX},${newY}`);
         this.stack.push([newX, newY]);
         this.tries++;
+        this.steps++; // Incrementa o contador de passos
+        document.getElementById("steps-value").innerText = this.steps;
+
         // Move o robô visualmente
         // Azul claro para caminho visitado
         if (
@@ -112,6 +122,9 @@ export class Player {
 
         // Se não deu certo, volta
         this.stack.pop();
+        this.steps++; // Incrementa o contador de passos ao voltar
+        document.getElementById("steps-value").innerText = this.steps;
+
         // Laranja claro para caminho errado
         if (
           window.matchMedia &&
