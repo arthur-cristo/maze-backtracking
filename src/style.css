@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 a {
@@ -161,6 +163,7 @@ button:focus-visible {
   aspect-ratio: 1;
   max-width: min(calc(100vh - 2rem), calc(100vw - 300px));
   margin: 0 auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .maze-row {
@@ -208,6 +211,8 @@ button:focus-visible {
   #maze-container {
     order: 1;
     max-width: min(calc(100vh - 300px), 100vw);
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
   }
 }
 
