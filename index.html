@@ -2,38 +2,35 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maze Backtracking</title>
     <link rel="stylesheet" href="./style.css" />
-    <link rel="icon" type="image/svg+xml" href=".icon.svg" />
-    <title>Maze Backtracking</title>  
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   </head>
-
   <body>
-    <div class="screen active" id="start-screen">
-      <h1>Maze Backtracking</h1>
-      <p id="description">
-        Bem-vindo ao jogo Maze Backtracking!<br />
-        Clique no botão abaixo para começar.
-      </p>
-      <button id="start-button">Começar</button>
-    </div>
-    <div class="screen inactive" id="maze-screen">
-      <aside id="sidebar">
+    <main class="main-container">
+      <aside>
         <h1>Maze Backtracking</h1>
-        <div id="data">
-          <h2 id="steps-text">Passos: <span id="steps-value">0</span></h2>
-          <h2 id="returns-text">Retornos: <span id="returns-value">0</span></h2>
-        </div>
-        <div id="buttons">
-          <button id="stop-button">Parar</button>
-          <button id="reset-button">Reiniciar</button>
-          <button id="menu-button">Voltar</button>
+        <div class="controls">
+          <div>
+            <label for="mazeSize">Tamanho:</label>
+            <input
+              type="range"
+              id="mazeSize"
+              value="25"
+              min="5"
+              max="99"
+              step="2"
+            />
+            <span id="mazeSizeValue">25</span>
+          </div>
+          <div>
+            <button id="generateMaze">Gerar Labirinto</button>
+            <button id="solveMaze">Resolver Labirinto</button>
+          </div>
         </div>
       </aside>
-      <div id="maze-container"></div>
-    </div>
-    <script type="module" src="script.js"></script>
-    <script type="module" src="playerService.js"></script>
-    <script type="module" src="mazeService.js"></script>
+      <div id="maze"></div>
+    </main>
+    <script src="script.js"></script>
   </body>
 </html>
