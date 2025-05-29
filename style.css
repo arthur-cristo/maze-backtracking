@@ -1,19 +1,19 @@
 :root {
   --bg-dark: #1a1a1a;
-  --bg-light: #cccccc;
+  --bg-light: #f5f5f5;
   --border-dark: #ffffff;
   --border-light: #213547;
   --start: limegreen;
   --end: orange;
-  --visited: red;
-  --current: #2196f3;
-  --path: #0d47a1;
-  --text: rgba(255, 255, 255, 0.87);
-  --current: cyan;
+  --visited: #ff4444;  /* Brighter red for better visibility */
+  --current: #2196f3;  /* Player color */
+  --path: #0d47a1;     /* Path color */
+  --text-dark: rgba(255, 255, 255, 0.87);
+  --text-light: #213547;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   color-scheme: light dark;
   background-color: #242424;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-dark);
   line-height: 1.5;
   font-weight: 400;
 }
@@ -70,9 +70,9 @@ button {
   font-size: 1em;
   padding: 0.6em 1.2em;
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--border-light);
   background-color: var(--bg-dark);
-  color: white;
+  color: var(--text-dark);
   cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
 }
@@ -98,10 +98,12 @@ button:focus-visible {
   width: 24px;
   height: 24px;
   background-color: var(--bg-dark);
+  margin: 0; /* Removed bottom margin */
+  border: none; /* Removed white border */
 }
 
 .wall {
-  background-color: black;
+  background-color: var(--border-light);
 }
 .start {
   background-color: var(--start);
@@ -155,27 +157,57 @@ input[type="range"]:focus::-moz-range-thumb {
 /* Light theme support */
 @media (prefers-color-scheme: light) {
   :root {
-    background-color: #ffffff;
-    color: var(--border-light);
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    --visited: #ff0000;      /* Bright red for light theme */
+    --current: #0066cc;      /* Darker blue for better contrast */
+    --path: #003366;         /* Darker blue path */
+    --start: #00aa00;        /* Darker green */
+    --end: #cc6600;          /* Darker orange */
   }
 
   body {
-    background-color: #ffffff;
-    color: var(--border-light);
+    background-color: var(--bg-light);
+    color: var(--text-light);
   }
 
   button {
     background-color: var(--bg-light);
-    color: var(--border-light);
+    color: var(--text-light);
+    border-color: var(--border-light);
   }
 
   .cell {
     background-color: var(--bg-light);
-    border: 1px solid var(--border-light);
+  }
+
+  .wall {
+    background-color: #555;  /* Darker walls for better contrast */
+  }
+
+  /* Ensure special cells are visible */
+  .visited {
+    background-color: var(--visited) !important;
+  }
+  
+  .current {
+    background-color: var(--current) !important;
+  }
+  
+  .path {
+    background-color: var(--path) !important;
+  }
+  
+  .start {
+    background-color: var(--start) !important;
+  }
+  
+  .end {
+    background-color: var(--end) !important;
   }
 
   input[type="range"] {
-    background: #ccc;
+    background: #aaa;
   }
 }
 
@@ -197,6 +229,25 @@ input[type="range"]:focus::-moz-range-thumb {
   box-sizing: border-box;
 }
 
+/* Mobile layout */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column; /* Stack elements vertically on mobile */
+    align-items: center; /* Center items in column layout */
+  }
+  
+  aside {
+    max-width: 100%; /* Full width on mobile */
+    width: 100%;
+  }
+  
+  #maze {
+    max-width: 100%; /* Full width on mobile */
+    width: 100%;
+    overflow: visible; /* Remove scrolling if not needed */
+  }
+}
+
 aside {
   flex: 1;
   max-width: 300px;
@@ -207,8 +258,4 @@ aside {
   flex: 2;
   max-width: calc(100vw - 350px);
   overflow: auto;
-}
-
-.current {
-  background-color: var(--current);
 }
