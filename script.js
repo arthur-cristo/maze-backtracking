@@ -64,6 +64,7 @@ class MazeGame {
     this.endPosition = {};
     this.visited = [];
     this.path = [];
+    this.solving = false;
 
     this.setupListeners();
     this.generateMaze();
@@ -114,21 +115,31 @@ class MazeGame {
   }
 
   solveMaze() {
+    if (this.solving) return;
+
+    this.solving = true;
+    this.elements.solveMaze.disabled = true;
     this.visited = [];
     this.path = [];
 
-    this.backtrack(this.currentPosition.x, this.currentPosition.y).then(
-      (found) => {
+    this.backtrack(this.currentPosition.x, this.currentPosition.y)
+      .then((found) => {
         if (!found) {
           alert("No path found.");
+        } else {
+          this.clearTemporaryMarks();
+          this.showFinalPath();
         }
-      }
-    );
+      })
+      .finally(() => {
+        this.solving = false;
+        this.elements.solveMaze.disabled = false;
+      });
   }
 
   async backtrack(x, y) {
     if (x === this.endPosition.x && y === this.endPosition.y) {
-      await this.markPath(x, y, true);
+      this.path.push({ x, y });
       return true;
     }
 
@@ -151,7 +162,10 @@ class MazeGame {
     for (const dir of directions) {
       const nx = x + dir.dx;
       const ny = y + dir.dy;
-      if (await this.backtrack(nx, ny)) return true;
+      if (await this.backtrack(nx, ny)) {
+        this.path.push({ x, y });
+        return true;
+      }
     }
 
     await this.markPath(x, y, false);
@@ -165,10 +179,47 @@ class MazeGame {
     if (x === 1 && y === 1) return;
     if (x === this.endPosition.x && y === this.endPosition.y) return;
 
-    cell.classList.remove("visited", "path");
-    cell.classList.add(correct ? "path" : "visited");
+    const prevPlayer = this.elements.maze.querySelector(".player");
+    if (prevPlayer) prevPlayer.classList.remove("player");
 
-    await new Promise((resolve) => setTimeout(resolve, 75));
+    cell.classList.remove("visited", "path");
+    cell.classList.add(correct ? "path" : "visited", "player");
+
+    await new Promise((resolve) => setTimeout(resolve, 60));
+  }
+
+  clearTemporaryMarks() {
+    const cells = this.elements.maze.children;
+    for (let i = 0; i < cells.length; i++) {
+      cells[i].classList.remove("visited", "path", "player");
+    }
+  }
+
+  async showFinalPath() {
+    const reversed = this.path.reverse();
+    for (let i = 0; i < reversed.length; i++) {
+      const step = reversed[i];
+      const index = step.x * this.size + step.y;
+      const cell = this.elements.maze.children[index];
+
+      if (
+        (step.x === 1 && step.y === 1) ||
+        (step.x === this.endPosition.x && step.y === this.endPosition.y)
+      )
+        continue;
+
+      // Clear previous player
+      const previousPlayer = this.elements.maze.querySelector(".player");
+      if (previousPlayer) previousPlayer.classList.remove("player");
+
+      cell.classList.add("solution", "player");
+
+      await new Promise((res) => setTimeout(res, 50));
+    }
+
+    // Final position
+    const finalIndex = this.endPosition.x * this.size + this.endPosition.y;
+    this.elements.maze.children[finalIndex].classList.add("player");
   }
 }
 
