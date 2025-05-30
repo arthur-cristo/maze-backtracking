@@ -1,5 +1,5 @@
 class MazeGenerator {
-  constructor(size = 21) {
+  constructor(size = 25) {
     this.size = size % 2 === 0 ? size + 1 : size;
     this.maze = [];
     this.initialize();
