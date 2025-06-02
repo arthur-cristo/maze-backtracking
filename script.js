@@ -98,8 +98,24 @@ class MazeGame {
 
   renderMaze() {
     this.elements.maze.innerHTML = "";
-    this.elements.maze.style.gridTemplateColumns = `repeat(${this.size}, 32px)`;
-    this.elements.maze.style.gridTemplateRows = `repeat(${this.size}, 32px)`;
+    let availableWidth = window.innerWidth;
+    let availableHeight = window.innerHeight;
+    const aside = document.querySelector('aside');
+    const isMobile = window.innerWidth <= 900;
+    if (!isMobile && aside) {
+      availableWidth -= aside.offsetWidth + 40;
+      availableHeight -= 40;
+    } else if (isMobile) {
+      availableWidth -= 10;
+      availableHeight -= (aside ? aside.offsetHeight : 0) + 30;
+    }
+    const available = Math.max(100, Math.min(availableWidth, availableHeight));
+    const cellSize = Math.floor(available / this.size);
+    const mazePx = cellSize * this.size;
+    this.elements.maze.style.width = `${mazePx}px`;
+    this.elements.maze.style.height = `${mazePx}px`;
+    this.elements.maze.style.gridTemplateColumns = `repeat(${this.size}, ${cellSize}px)`;
+    this.elements.maze.style.gridTemplateRows = `repeat(${this.size}, ${cellSize}px)`;
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         const cell = document.createElement("div");
@@ -107,6 +123,8 @@ class MazeGame {
         if (this.maze[i][j] === 1) cell.classList.add("wall");
         if (i === 1 && j === 1) cell.classList.add("start");
         if (i === this.endPosition.x && j === this.endPosition.y) cell.classList.add("end");
+        cell.style.width = `${cellSize}px`;
+        cell.style.height = `${cellSize}px`;
         this.elements.maze.appendChild(cell);
       }
     }
@@ -194,6 +212,12 @@ class MazeGame {
   }
 }
 
+window.addEventListener('resize', () => {
+  if (window._mazeGameInstance && typeof window._mazeGameInstance.renderMaze === 'function') {
+    window._mazeGameInstance.renderMaze();
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
-  new MazeGame();
+  window._mazeGameInstance = new MazeGame();
 });

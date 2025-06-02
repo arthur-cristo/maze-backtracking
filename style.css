@@ -18,11 +18,20 @@
   font-weight: 400;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   background: #f7f7f7;
   font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 h1 {
@@ -37,8 +46,8 @@ h1 {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: flex-start;
-  min-height: 100vh;
+  align-items: stretch;
+  height: 100vh;
   width: 100vw;
   box-sizing: border-box;
   background: #f7f7f7;
@@ -49,12 +58,15 @@ aside {
   border-radius: 12px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
   padding: 2.5rem 2rem 2rem 2rem;
-  margin: 2rem 2rem 2rem 3vw;
+  margin: 2rem 0 2rem 3vw;
   min-width: 270px;
   max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
+  height: calc(100vh - 4rem);
+  box-sizing: border-box;
 }
 
 .size-control {
@@ -124,34 +136,37 @@ aside {
 }
 
 .maze-section {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex: 1;
-  margin-top: 2rem;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 #maze {
   display: grid;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
   background: #e5e7eb;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  margin-left: 0;
-  margin-right: auto;
-  margin-top: 0;
-  margin-bottom: 0;
-  overflow: auto;
-  max-width: 70vw;
-  max-height: 80vh;
+  margin: 0 auto;
+  overflow: hidden;
+  place-items: center;
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
   background: #e5e7eb;
   border: 1.5px solid #bfc5cc;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 }
 .cell.wall {
   background: #bfc5cc;
@@ -177,20 +192,46 @@ aside {
 @media (max-width: 900px) {
   .main-container {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     padding: 0;
+    height: 100vh;
   }
   aside {
-    margin: 1.5rem 0 0 0;
-    min-width: 90vw;
+    margin: 1.5rem auto 0 auto;
+    min-width: 0;
     max-width: 98vw;
+    width: 95vw;
+    height: auto;
   }
   .maze-section {
     margin: 1.5rem 0 0 0;
     align-items: center;
+    padding: 1rem 0;
+    height: 60vw;
+    min-height: 0;
   }
   #maze {
+    width: 95vw;
+    height: 95vw;
     max-width: 95vw;
-    max-height: 60vw;
+    max-height: 95vw;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 600px) {
+  aside {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+    margin: 0.5rem auto 0 auto;
+  }
+  .maze-section {
+    height: 50vw;
+    min-height: 0;
+  }
+  #maze {
+    width: 98vw;
+    height: 98vw;
+    max-width: 98vw;
+    max-height: 98vw;
   }
 }
