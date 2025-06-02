@@ -10,26 +10,25 @@
     <main class="main-container">
       <aside>
         <h1>Maze Backtracking</h1>
+        <div class="size-control">
+          <label for="mazeSize">Tamanho do labirinto:</label>
+          <input type="range" id="mazeSize" min="7" max="41" step="2" value="15" />
+          <span id="mazeSizeValue">15x15</span>
+        </div>
+        <div class="counters">
+          <div><span class="counter-label">Passos dados:</span> <span id="steps" class="counter-value">0</span></div>
+          <div><span class="counter-label">Retornos:</span> <span id="backtracks" class="counter-value">0</span></div>
+        </div>
         <div class="controls">
-          <div>
-            <label for="mazeSize">Tamanho:</label>
-            <input
-              type="range"
-              id="mazeSize"
-              value="25"
-              min="5"
-              max="99"
-              step="2"
-            />
-            <span id="mazeSizeValue">25</span>
-          </div>
-          <div>
-            <button id="generateMaze">Gerar Labirinto</button>
-            <button id="solveMaze">Resolver Labirinto</button>
-          </div>
+          <button id="solveMaze">Resolver Labirinto</button>
+          <button id="stopMaze">Parar</button>
+          <button id="resetMaze">Reiniciar</button>
+          <button id="backButton">Voltar</button>
         </div>
       </aside>
-      <div id="maze"></div>
+      <section class="maze-section">
+        <div id="maze"></div>
+      </section>
     </main>
     <script src="script.js"></script>
   </body>
