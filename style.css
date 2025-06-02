@@ -259,3 +259,15 @@ aside {
     font-size: 0.9375rem;
   }
 }
+
+.controls button:disabled,
+#mazeSize:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+#solveMaze:disabled {
+  background: var(--secondary);
+  color: var(--text-light);
+}

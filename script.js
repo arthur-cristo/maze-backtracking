@@ -56,7 +56,6 @@ class MazeGame {
       solveMaze: document.getElementById("solveMaze"),
       stopMaze: document.getElementById("stopMaze"),
       resetMaze: document.getElementById("resetMaze"),
-      backButton: document.getElementById("backButton"),
       steps: document.getElementById("steps"),
       backtracks: document.getElementById("backtracks"),
       mazeSize: document.getElementById("mazeSize"),
@@ -64,8 +63,15 @@ class MazeGame {
       speedControl: document.getElementById("speedControl"),
       speedValue: document.getElementById("speedValue"),
     };
-    this.size = parseInt(this.elements.mazeSize.value);
-    this.speed = parseInt(this.elements.speedControl.value);
+
+    // Validação dos elementos necessários
+    if (!this.validateElements()) {
+      console.error("Elementos necessários não encontrados!");
+      return;
+    }
+
+    this.size = this.validateSize(parseInt(this.elements.mazeSize.value));
+    this.speed = this.validateSpeed(parseInt(this.elements.speedControl.value));
     this.generator = new MazeGenerator(this.size);
     this.maze = this.generator.getMaze();
     this.currentPosition = { x: 1, y: 1 };
@@ -81,19 +87,52 @@ class MazeGame {
     this.updateCounters();
   }
 
+  validateElements() {
+    return Object.values(this.elements).every(element => element !== null);
+  }
+
+  validateSize(size) {
+    const minSize = 7;
+    const maxSize = 41;
+    return Math.min(Math.max(size, minSize), maxSize);
+  }
+
+  validateSpeed(speed) {
+    const minSpeed = 1;
+    const maxSpeed = 100;
+    return Math.min(Math.max(speed, minSpeed), maxSpeed);
+  }
+
   setupListeners() {
-    this.elements.solveMaze.onclick = () => this.solveMaze();
-    this.elements.stopMaze.onclick = () => this.stop();
+    if (!this.elements.solveMaze || !this.elements.stopMaze || 
+        !this.elements.resetMaze || !this.elements.mazeSize || 
+        !this.elements.speedControl) {
+      return;
+    }
+
+    this.elements.solveMaze.onclick = () => {
+      if (!this.solving) {
+        this.solveMaze();
+      }
+    };
+
+    this.elements.stopMaze.onclick = () => {
+      if (this.solving) {
+        this.stop();
+      }
+    };
+
     this.elements.resetMaze.onclick = () => this.reset();
-    this.elements.backButton.onclick = () => window.location.reload();
+
     this.elements.mazeSize.oninput = (e) => {
-      const val = parseInt(e.target.value);
+      const val = this.validateSize(parseInt(e.target.value));
       this.size = val;
       this.elements.mazeSizeValue.textContent = `${val}x${val}`;
       this.reset();
     };
+
     this.elements.speedControl.oninput = (e) => {
-      const val = parseInt(e.target.value);
+      const val = this.validateSpeed(parseInt(e.target.value));
       this.speed = val;
       let speedText = "Normal";
       if (val < 25) speedText = "Muito Lento";
@@ -146,32 +185,58 @@ class MazeGame {
 
   async solveMaze() {
     if (this.solving) return;
-    this.solving = true;
-    this.shouldStop = false;
-    this.steps = 0;
-    this.backtracks = 0;
-    this.updateCounters();
-    this.visited = [];
-    this.path = [];
-    await this.backtrack(this.currentPosition.x, this.currentPosition.y);
-    this.solving = false;
+    
+    try {
+      this.solving = true;
+      this.shouldStop = false;
+      this.steps = 0;
+      this.backtracks = 0;
+      this.updateCounters();
+      this.visited = [];
+      this.path = [];
+      
+      // Desabilita os controles durante a resolução
+      this.toggleControls(true);
+      
+      await this.backtrack(this.currentPosition.x, this.currentPosition.y);
+    } catch (error) {
+      console.error("Erro ao resolver o labirinto:", error);
+    } finally {
+      this.solving = false;
+      this.toggleControls(false);
+    }
+  }
+
+  toggleControls(disabled) {
+    if (this.elements.solveMaze) this.elements.solveMaze.disabled = disabled;
+    if (this.elements.mazeSize) this.elements.mazeSize.disabled = disabled;
+    if (this.elements.resetMaze) this.elements.resetMaze.disabled = disabled;
   }
 
   stop() {
-    this.shouldStop = true;
+    if (this.solving) {
+      this.shouldStop = true;
+      this.toggleControls(false);
+    }
   }
 
   reset() {
-    this.generator = new MazeGenerator(this.size);
-    this.maze = this.generator.getMaze();
-    this.currentPosition = { x: 1, y: 1 };
-    this.endPosition = { x: this.size - 2, y: this.size - 2 };
-    this.visited = [];
-    this.path = [];
-    this.steps = 0;
-    this.backtracks = 0;
-    this.updateCounters();
-    this.renderMaze();
+    if (this.solving) return;
+    
+    try {
+      this.generator = new MazeGenerator(this.size);
+      this.maze = this.generator.getMaze();
+      this.currentPosition = { x: 1, y: 1 };
+      this.endPosition = { x: this.size - 2, y: this.size - 2 };
+      this.visited = [];
+      this.path = [];
+      this.steps = 0;
+      this.backtracks = 0;
+      this.updateCounters();
+      this.renderMaze();
+    } catch (error) {
+      console.error("Erro ao resetar o labirinto:", error);
+    }
   }
 
   async backtrack(x, y) {
@@ -226,12 +291,13 @@ class MazeGame {
   }
 
   getSpeedDelay(baseDelay) {
-    // Converte o valor do slider (1-100) para um multiplicador de velocidade
-    // 1 = mais lento (4x mais lento)
-    // 50 = velocidade normal (1x)
-    // 100 = mais rápido (4x mais rápido)
-    const speedMultiplier = 4 - (this.speed / 25);
-    return Math.max(1, Math.floor(baseDelay * speedMultiplier));
+    try {
+      const speedMultiplier = 4 - (this.speed / 25);
+      return Math.max(1, Math.floor(baseDelay * speedMultiplier));
+    } catch (error) {
+      console.error("Erro ao calcular o delay:", error);
+      return baseDelay;
+    }
   }
 }
 
