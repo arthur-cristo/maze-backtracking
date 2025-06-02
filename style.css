@@ -86,6 +86,17 @@ aside {
   font-weight: 600;
 }
 
+#speedValue {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+#speedControl {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
 .counters {
   display: flex;
   flex-direction: column;

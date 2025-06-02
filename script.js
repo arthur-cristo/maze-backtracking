@@ -61,8 +61,11 @@ class MazeGame {
       backtracks: document.getElementById("backtracks"),
       mazeSize: document.getElementById("mazeSize"),
       mazeSizeValue: document.getElementById("mazeSizeValue"),
+      speedControl: document.getElementById("speedControl"),
+      speedValue: document.getElementById("speedValue"),
     };
     this.size = parseInt(this.elements.mazeSize.value);
+    this.speed = parseInt(this.elements.speedControl.value);
     this.generator = new MazeGenerator(this.size);
     this.maze = this.generator.getMaze();
     this.currentPosition = { x: 1, y: 1 };
@@ -88,6 +91,17 @@ class MazeGame {
       this.size = val;
       this.elements.mazeSizeValue.textContent = `${val}x${val}`;
       this.reset();
+    };
+    this.elements.speedControl.oninput = (e) => {
+      const val = parseInt(e.target.value);
+      this.speed = val;
+      let speedText = "Normal";
+      if (val < 25) speedText = "Muito Lento";
+      else if (val < 50) speedText = "Lento";
+      else if (val < 75) speedText = "Normal";
+      else if (val < 100) speedText = "Rápido";
+      else speedText = "Muito Rápido";
+      this.elements.speedValue.textContent = speedText;
     };
   }
 
@@ -174,7 +188,7 @@ class MazeGame {
     this.steps++;
     this.updateCounters();
     this.markCell(x, y, "current");
-    await this.sleep(40);
+    await this.sleep(this.getSpeedDelay(40));
     const directions = [
       { dx: 1, dy: 0 },
       { dx: 0, dy: 1 },
@@ -193,7 +207,7 @@ class MazeGame {
     this.backtracks++;
     this.updateCounters();
     this.markCell(x, y, "visited");
-    await this.sleep(20);
+    await this.sleep(this.getSpeedDelay(20));
     return false;
   }
 
@@ -209,6 +223,15 @@ class MazeGame {
 
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  getSpeedDelay(baseDelay) {
+    // Converte o valor do slider (1-100) para um multiplicador de velocidade
+    // 1 = mais lento (4x mais lento)
+    // 50 = velocidade normal (1x)
+    // 100 = mais rápido (4x mais rápido)
+    const speedMultiplier = 4 - (this.speed / 25);
+    return Math.max(1, Math.floor(baseDelay * speedMultiplier));
   }
 }
 
