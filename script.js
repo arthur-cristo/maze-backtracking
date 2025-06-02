@@ -203,6 +203,7 @@ class MazeGame {
       
       // Desabilita os controles durante a resolução
       this.toggleControls(true);
+      this.updateShuffleButton();
       
       await this.backtrack(this.currentPosition.x, this.currentPosition.y);
     } catch (error) {
@@ -212,19 +213,21 @@ class MazeGame {
       this.isPaused = false;
       this.toggleControls(false);
       this.updateStopButton();
+      this.updateShuffleButton();
     }
   }
 
   toggleControls(disabled) {
     if (this.elements.solveMaze) this.elements.solveMaze.disabled = disabled;
     if (this.elements.mazeSize) this.elements.mazeSize.disabled = disabled;
-    if (this.elements.resetMaze) this.elements.resetMaze.disabled = disabled;
+    if (this.elements.resetMaze) this.elements.resetMaze.disabled = (this.elements.solveMaze ? this.elements.solveMaze.disabled : disabled);
   }
 
   pause() {
     if (this.solving && !this.isPaused) {
       this.isPaused = true;
       this.updateStopButton();
+      this.updateShuffleButton();
     }
   }
 
@@ -232,6 +235,7 @@ class MazeGame {
     if (this.solving && this.isPaused) {
       this.isPaused = false;
       this.updateStopButton();
+      this.updateShuffleButton();
     }
   }
 
@@ -239,31 +243,45 @@ class MazeGame {
     if (this.elements.stopMaze) {
       this.elements.stopMaze.textContent = this.isPaused ? "Retomar" : "Parar";
     }
-  }
-
-  stop() {
-    if (this.solving) {
-      this.shouldStop = true;
-      this.isPaused = false;
-      this.toggleControls(false);
-      this.updateStopButton();
+    // Desabilita o botão embaralhar durante toda a execução (resolvendo ou pausado)
+    if (this.elements.resetMaze) {
+      this.elements.resetMaze.disabled = !!this.solving;
     }
   }
 
+  updateShuffleButton() {
+    if (!this.elements.resetMaze) return;
+    const atStart = this.currentPosition.x === 1 && this.currentPosition.y === 1;
+    const atEnd = this.currentPosition.x === this.endPosition.x && this.currentPosition.y === this.endPosition.y;
+    this.elements.resetMaze.disabled = !(atStart || atEnd);
+  }
+
   reset() {
-    if (this.solving) return;
-    
+    // Permite resetar a qualquer momento
     try {
+      // Para a resolução atual se estiver em andamento
+      if (this.solving) {
+        this.shouldStop = true;
+        this.solving = false;
+        this.isPaused = false;
+      }
+
+      // Gera um novo labirinto (embaralha)
       this.generator = new MazeGenerator(this.size);
       this.maze = this.generator.getMaze();
       this.currentPosition = { x: 1, y: 1 };
       this.endPosition = { x: this.size - 2, y: this.size - 2 };
-      this.visited = [];
       this.path = [];
+      this.visited = [];
       this.steps = 0;
       this.backtracks = 0;
+      
+      // Atualiza a interface
       this.updateCounters();
       this.renderMaze();
+      this.updateStopButton();
+      this.toggleControls(false);
+      this.updateShuffleButton();
     } catch (error) {
       console.error("Erro ao resetar o labirinto:", error);
     }
@@ -327,6 +345,9 @@ class MazeGame {
     if (type) cell.classList.add(type);
     if (x === 1 && y === 1) cell.classList.add("start");
     if (x === this.endPosition.x && y === this.endPosition.y) cell.classList.add("end");
+    // Atualiza o botão embaralhar sempre que o player se move
+    this.currentPosition = { x, y };
+    this.updateShuffleButton();
   }
 
   sleep(ms) {
