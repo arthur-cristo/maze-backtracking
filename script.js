@@ -80,6 +80,7 @@ class MazeGame {
     this.path = [];
     this.solving = false;
     this.shouldStop = false;
+    this.isPaused = false;
     this.steps = 0;
     this.backtracks = 0;
     this.renderMaze();
@@ -118,7 +119,11 @@ class MazeGame {
 
     this.elements.stopMaze.onclick = () => {
       if (this.solving) {
-        this.stop();
+        if (this.isPaused) {
+          this.resume();
+        } else {
+          this.pause();
+        }
       }
     };
 
@@ -189,6 +194,7 @@ class MazeGame {
     try {
       this.solving = true;
       this.shouldStop = false;
+      this.isPaused = false;
       this.steps = 0;
       this.backtracks = 0;
       this.updateCounters();
@@ -203,7 +209,9 @@ class MazeGame {
       console.error("Erro ao resolver o labirinto:", error);
     } finally {
       this.solving = false;
+      this.isPaused = false;
       this.toggleControls(false);
+      this.updateStopButton();
     }
   }
 
@@ -213,10 +221,32 @@ class MazeGame {
     if (this.elements.resetMaze) this.elements.resetMaze.disabled = disabled;
   }
 
+  pause() {
+    if (this.solving && !this.isPaused) {
+      this.isPaused = true;
+      this.updateStopButton();
+    }
+  }
+
+  resume() {
+    if (this.solving && this.isPaused) {
+      this.isPaused = false;
+      this.updateStopButton();
+    }
+  }
+
+  updateStopButton() {
+    if (this.elements.stopMaze) {
+      this.elements.stopMaze.textContent = this.isPaused ? "Retomar" : "Parar";
+    }
+  }
+
   stop() {
     if (this.solving) {
       this.shouldStop = true;
+      this.isPaused = false;
       this.toggleControls(false);
+      this.updateStopButton();
     }
   }
 
@@ -241,6 +271,19 @@ class MazeGame {
 
   async backtrack(x, y) {
     if (this.shouldStop) return false;
+    
+    // Verifica se está pausado
+    if (this.isPaused) {
+      await new Promise(resolve => {
+        const checkPause = setInterval(() => {
+          if (!this.isPaused) {
+            clearInterval(checkPause);
+            resolve();
+          }
+        }, 100);
+      });
+    }
+
     if (x === this.endPosition.x && y === this.endPosition.y) {
       this.path.push({ x, y });
       this.markCell(x, y, "path");
